@@ -1,8 +1,14 @@
 class TasksController < ApplicationController
+  before_action :require_user_logged_in
   before_action :set_task, only: [:show, :edit, :update, :destroy]
   
   def index
-    @tasks = Task.all
+    if logged_in?
+      @task = current_user.tasks
+      @tasks = current_user.tasks.order('created_at DESC')
+    end
+    
+    # @tasks = Task.all
   end
 
   def show
@@ -13,7 +19,8 @@ class TasksController < ApplicationController
   end
 
   def create
-    @task = Task.new(task_params)
+    #@task = Task.new(task_params)
+    @task = current_user.tasks.build(task_params)
     
     if @task.save
       flash[:success] = 'タスクが正常に登録されました'
